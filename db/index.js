@@ -6,7 +6,7 @@ const client = new pg.Client({
   user: 'postgres',
   password: 'password',
   host: 'localhost',
-  port: 55556,
+  port: 5555,
   database: 'juicebox'
 }
 );
