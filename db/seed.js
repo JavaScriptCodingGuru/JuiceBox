@@ -2,7 +2,6 @@
 
 // grab our client with destructuring from the export in index.js
 const { client } = require('./index');
-
 async function testDB() {
   try {
     // connect the client to the database, finally
