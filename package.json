@@ -2,5 +2,24 @@
   "dependencies": {
     "nodemon": "^2.0.20",
     "pg": "^8.9.0"
-  }
+  },
+  "name": "juicebox",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JavaScriptCodingGuru/JuiceBox.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JavaScriptCodingGuru/JuiceBox/issues"
+  },
+  "homepage": "https://github.com/JavaScriptCodingGuru/JuiceBox#readme",
+  "description": ""
 }
