@@ -3,11 +3,7 @@ const pg = require('pg'); // imports the pg module
 
 // supply the db name and location of the database
 const client = new pg.Client({
-    user: 'postgres',
-    password: 'password',
-    host: 'localhost',
-    port: 5555,
-    database: 'juicebox'
+    
 }
 );
 
@@ -63,9 +59,118 @@ async function updateUser(id, fields = {}) {
     }
   }
 
+async function getUserById(userId) {
+  // first get the user (NOTE: Remember the query returns 
+    // (1) an object that contains 
+    // (2) a `rows` array that (in this case) will contain 
+    // (3) one object, which is our user.
+  // if it doesn't exist (if there are no `rows` or `rows.length`), return null
+
+  // if it does:
+  // delete the 'password' key from the returned object
+  // get their posts (use getPostsByUser)
+  // then add the posts to the user object with key 'posts'
+  // return the user object
+
+  try {
+    const { rows } = await client.query(`
+      SELECT * FROM users
+      WHERE "id"=${ userId };
+    `);
+
+    if (!rows.length) {
+      return null;
+    }
+
+    delete rows.password;
+
+    const posts = getPostsByUser(userId);
+    rows.posts = posts;
+
+    return rows
+  } catch (error) {
+    throw error;
+  }
+}
+
+  async function createPost({
+    authorId,
+    title,
+    content
+  }) {
+    try {
+      const result= await client.query(`
+        INSERT INTO posts("authorId", title, content)
+        VALUES ($1, $2, $3)
+        RETURNING *;
+      `, [authorId, title, content]);
+        return result.rows;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+async function updatePost(id, fields={
+  title,
+  content,
+  active
+}) {
+  // build the set string
+  const setString = Object.keys(fields).map(
+    (key, index) => `"${ key }"=$${ index + 1 }`
+  ).join(', ');
+
+  // return early if this is called without fields
+  if (setString.length === 0) {
+    return;
+  }
+
+  try {
+    const {rows :[post]} = await client.query(`
+        UPDATE posts
+        SET ${ setString }
+        WHERE id=${ id }
+        RETURNING *;
+      `, Object.values(fields));
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getAllPosts() {
+  try {
+    const {rows} = await client.query(
+      `SELECT "authorId", title, content, active
+      FROM posts;`
+    );
+  
+  return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getPostsByUser(userId) {
+  try {
+    const { rows } = await client.query(`
+      SELECT * FROM posts
+      WHERE "authorId"=${ userId };
+    `);
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   client,
   getAllUsers,
   createUser,
-  updateUser
+  updateUser,
+  createPost,
+  updatePost,
+  getAllPosts,
+  getPostsByUser,
+  getUserById
 }
