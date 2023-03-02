@@ -1,11 +1,8 @@
 // inside db/seed.js
 
 // grab our client with destructuring from the export in index.js
-const { client, getAllUsers } = require('./index');
+const { client, getAllUsers, createUser, updateUser } = require('./index');
 
-const {
-  createUser
-} = require('./index');
 
 // new function, should attempt to create a few users
 async function createInitialUsers() {
@@ -34,6 +31,13 @@ async function testDB() {
     console.log("result:", result);
     const users = await getAllUsers();
     console.log("getAllUsers:", users);
+
+    console.log("Calling updateUser on users[0]")
+    const updateUserResult = await updateUser(users[0].id, {
+      name: "Newname Sogood",
+      location: "Lesterville, KY"
+    });
+    console.log("Result:", updateUserResult);
 
     // for now, logging is a fine way to see what's up
     console.log("Finished database tests!")
