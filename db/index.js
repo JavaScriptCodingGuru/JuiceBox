@@ -3,11 +3,7 @@ const pg = require('pg'); // imports the pg module
 
 // supply the db name and location of the database
 const client = new pg.Client({
-  user: 'andrewpc1013',
-  password: 'K^erasin8',
-  host: 'localhost',
-  port: 5432,
-  database: 'juicebox-dev'
+  
 }
 );
 
@@ -102,14 +98,12 @@ async function getUserById(userId) {
     title,
     content
   }) {
-    console.log("here")
     try {
       const result= await client.query(`
         INSERT INTO posts("authorId", title, content)
         VALUES ($1, $2, $3)
         RETURNING *;
       `, [authorId, title, content]);
-      console.log("here too")
         return result.rows;
     } catch (error) {
       throw error;
@@ -164,6 +158,38 @@ async function getPostsByUser(userId) {
   }
 }
 
+async function getPostById(postId) {
+  try {
+    const { rows: [ post ]  } = await client.query(`
+      SELECT *
+      FROM posts
+      WHERE id=$1;
+    `, [postId]);
+
+    const { rows: tags } = await client.query(`
+      SELECT tags.*
+      FROM tags
+      JOIN post_tags ON tags.id=post_tags."tagId"
+      WHERE post_tags."postId"=$1;
+    `, [postId])
+
+    const { rows: [author] } = await client.query(`
+      SELECT id, username, name, location
+      FROM users
+      WHERE id=$1;
+    `, [post.authorId])
+
+    post.tags = tags;
+    post.author = author;
+
+    delete post.authorId;
+
+    return post;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function createTags(tagList) {
   if (tagList.length === 0) { 
     return; 
@@ -179,14 +205,16 @@ async function createTags(tagList) {
     (_, index) => `$${index + 1}`).join(', ');
   // then we can use (${ selectValues }) in our string template
 
+  console.log(insertValues, selectValues);
+
   try {
     // insert the tags, doing nothing on conflict
     // returning nothing, we'll query after
     await client.query(`
         INSERT INTO tags(name)
-        VALUES ${insertValues}
+        VALUES (${insertValues})
         ON CONFLICT (name) DO NOTHING;
-      `);
+      `, tagList);
 
     // select all tags where the name is in our taglist
     // return the rows from the query
@@ -194,10 +222,36 @@ async function createTags(tagList) {
       SELECT * FROM tags
       WHERE name
       IN ${selectValues};
-    `);
+    `, tagList);
 
     return result.rows;
 
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function createPostTag(postId, tagId) {
+  try {
+    await client.query(`
+      INSERT INTO post_tags("postId", "tagId")
+      VALUES ($1, $2)
+      ON CONFLICT ("postId", "tagId") DO NOTHING;
+    `, [postId, tagId]);
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function addTagsToPost(postId, tagList) {
+  try {
+    const createPostTagPromises = tagList.map(
+      tag => createPostTag(postId, tag.id)
+    );
+
+    await Promise.all(createPostTagPromises);
+
+    return await getPostById(postId);
   } catch (error) {
     throw error;
   }
@@ -212,5 +266,8 @@ module.exports = {
   updatePost,
   getAllPosts,
   getPostsByUser,
-  getUserById
+  getUserById,
+  createTags,
+  createPostTag,
+  addTagsToPost
 }
