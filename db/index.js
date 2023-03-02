@@ -48,7 +48,7 @@ async function updateUser(id, fields = {}) {
     if (setString.length === 0) {
       return;
     }
-  
+    console.log(setString)
     try {
       const {rows :[user]} = await client.query(`
         UPDATE users
@@ -56,7 +56,7 @@ async function updateUser(id, fields = {}) {
         WHERE id=${ id }
         RETURNING *;
       `, Object.values(fields));
-  
+      
       return user;
     } catch (error) {
       throw error;
@@ -116,28 +116,27 @@ async function getUserById(userId) {
     }
   }
 
-async function updatePost(id, fields={
+async function updatePost(id, {
   title,
   content,
   active
 }) {
   // build the set string
-  const setString = Object.keys(fields).map(
-    (key, index) => `"${ key }"=$${ index + 1 }`
-  ).join(', ');
-
+  console.log("1")
+  const setString = `"${title}"=$1, "${content}" = $2, "${active}"=$3`;
+  console.log("2")
   // return early if this is called without fields
   if (setString.length === 0) {
     return;
   }
-
+  console.log(setString)
   try {
     const {rows :[post]} = await client.query(`
         UPDATE posts
         SET ${ setString }
         WHERE id=${ id }
         RETURNING *;
-      `, Object.values(fields));
+      `, Object.values(title, content, active));
   } catch (error) {
     throw error;
   }

@@ -1,7 +1,7 @@
 // inside db/seed.js
 
 // grab our client with destructuring from the export in index.js
-const { client, getAllUsers, createUser, updateUser, getAllPosts, getUserById, createPost, getPostsByUser } = require('./index');
+const { client, getAllUsers, createUser, updateUser, getAllPosts, getUserById, createPost, getPostsByUser, updatePost } = require('./index');
 
 
 // new function, should attempt to create a few users
