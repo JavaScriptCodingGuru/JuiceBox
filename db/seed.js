@@ -1,7 +1,7 @@
 // inside db/seed.js
 
 // grab our client with destructuring from the export in index.js
-const { client, getAllUsers, createUser, updateUser } = require('./index');
+const { client, getAllUsers, createUser, updateUser, getAllPosts, getUserById, createPost, getPostsByUser } = require('./index');
 
 
 // new function, should attempt to create a few users
@@ -19,44 +19,69 @@ async function createInitialUsers() {
     throw error;
   }
 }
+async function createInitialPosts() {
+  try {
+    const [albert, sandra, glamgal] = await getAllUsers();
+
+    await createPost({
+      authorId: albert.id,
+      title: "First Post",
+      content: "This is my first post. I hope I love writing blogs as much as I love writing them."
+    });
+
+    // a couple more
+  } catch (error) {
+    throw error;
+  }
+}
 
 async function testDB() {
   try {
-    // connect the client to the database, finally
     console.log("Starting to test database...");
 
-    // queries are promises, so we can await them
-    const result = await client.query(`SELECT * FROM users;`);
-
-    console.log("result:", result);
+    console.log("Calling getAllUsers");
     const users = await getAllUsers();
-    console.log("getAllUsers:", users);
+    console.log("Result:", users);
 
-    console.log("Calling updateUser on users[0]")
+    console.log("Calling updateUser on users[0]");
     const updateUserResult = await updateUser(users[0].id, {
       name: "Newname Sogood",
       location: "Lesterville, KY"
     });
     console.log("Result:", updateUserResult);
 
-    // for now, logging is a fine way to see what's up
-    console.log("Finished database tests!")
-  } catch (error) {
-    console.error(error);
-  } 
-}
+    console.log("Calling getAllPosts");
+    const posts = await getAllPosts();
+    console.log("Result:", posts);
 
+    console.log("Calling updatePost on posts[0]");
+    const updatePostResult = await updatePost(posts[0].id, {
+      title: "New Title",
+      content: "Updated Content"
+    });
+    console.log("Result:", updatePostResult);
+
+    console.log("Calling getUserById with 1");
+    const albert = await getUserById(1);
+    console.log("Result:", albert);
+
+    console.log("Finished database tests!");
+  } catch (error) {
+    console.log("Error during testDB");
+    throw error;
+  }
+}
 async function dropTables() {
   try {
     console.log("Starting to drop tables...");
 
     await client.query(`
-    DROP TABLE IF EXISTS posts
+    DROP TABLE IF EXISTS users
     `);
 
     await client.query(`
-    DROP TABLE IF EXISTS users
-    `);
+    DROP TABLE IF EXISTS posts
+    `)
 
     console.log("Finished dropping tables!");
   } catch (error) {
@@ -84,13 +109,12 @@ async function createTables() {
     await client.query(`
     CREATE TABLE posts(
       id SERIAL PRIMARY KEY,
-      "authorId" INTEGER REFERENCES users(id) NOT NULL,
-      title VARCHAR(255) NOT NULL,
+      "authorId" varchar(255) NOT NULL,
+      title varchar(255) NOT NULL,
       content TEXT NOT NULL,
       active BOOLEAN DEFAULT true
     );
-    `);
-
+    `)
     console.log("Finished building tables")
   } catch (error) {
     console.error("Error building tables!");
@@ -105,6 +129,7 @@ async function rebuildDB() {
     await dropTables();
     await createTables();
     await createInitialUsers();
+    await createInitialPosts();
   } catch (error) {
     console.error(error);
   }

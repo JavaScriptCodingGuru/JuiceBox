@@ -3,7 +3,11 @@ const pg = require('pg'); // imports the pg module
 
 // supply the db name and location of the database
 const client = new pg.Client({
-    
+  user: 'postgres',
+  password: 'password',
+  host: 'localhost',
+  port: 5555,
+  database: 'juicebox'
 }
 );
 
@@ -98,12 +102,14 @@ async function getUserById(userId) {
     title,
     content
   }) {
+    console.log("here")
     try {
       const result= await client.query(`
         INSERT INTO posts("authorId", title, content)
         VALUES ($1, $2, $3)
         RETURNING *;
       `, [authorId, title, content]);
+      console.log("here too")
         return result.rows;
     } catch (error) {
       throw error;
