@@ -3,11 +3,11 @@ const pg = require('pg'); // imports the pg module
 
 // supply the db name and location of the database
 const client = new pg.Client({
-  user: 'postgres',
-  password: 'password',
+  user: 'andrewpc1013',
+  password: 'K^erasin8',
   host: 'localhost',
-  port: 5555,
-  database: 'juicebox'
+  port: 5432,
+  database: 'juicebox-dev'
 }
 );
 
