@@ -14,22 +14,22 @@ const client = new pg.Client({
 async function getAllUsers()
 {
     const {rows} = await client.query(
-        `SELECT id, username
+        `SELECT id, username, name, location, active
         FROM users;`
     );
     
     return rows;
 }
 
-async function createUser({username, password})
+async function createUser({username, password, name, location})
 {
     try{
         const result= await client.query(`
-        INSERT INTO users(username, password)
-        VALUES ($1, $2)
+        INSERT INTO users(username, password, name, location)
+        VALUES ($1, $2, $3, $4)
         ON CONFLICT (username) DO NOTHING 
         RETURNING *;
-      `, [username, password]);
+      `, [username, password, name, location]);
         return result.rows;
     }
     catch(e)
