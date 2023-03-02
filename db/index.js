@@ -88,7 +88,7 @@ async function getUserById(userId) {
 
     delete rows.password;
 
-    const posts = getPostsByUser(userId);
+    const posts = await getPostsByUser(userId);
     rows.posts = posts;
 
     return rows
@@ -116,27 +116,23 @@ async function getUserById(userId) {
     }
   }
 
-async function updatePost(id, {
-  title,
-  content,
-  active
-}) {
+async function updatePost(id, fields = {}) {
   // build the set string
-  console.log("1")
-  const setString = `"${title}"=$1, "${content}" = $2, "${active}"=$3`;
-  console.log("2")
-  // return early if this is called without fields
+  const setString = Object.keys(fields).map(
+    (key, index) =>`"${ key }"=$${ index + 1 }`
+  ).join(', ');
   if (setString.length === 0) {
     return;
   }
-  console.log(setString)
+  console.log(setString, id)
   try {
     const {rows :[post]} = await client.query(`
         UPDATE posts
         SET ${ setString }
         WHERE id=${ id }
         RETURNING *;
-      `, Object.values(title, content, active));
+      `, Object.values(fields));
+      return post;
   } catch (error) {
     throw error;
   }
@@ -145,7 +141,7 @@ async function updatePost(id, {
 async function getAllPosts() {
   try {
     const {rows} = await client.query(
-      `SELECT "authorId", title, content, active
+      `SELECT "authorId", title, content, active, id
       FROM posts;`
     );
   

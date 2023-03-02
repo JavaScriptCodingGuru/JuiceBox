@@ -52,7 +52,7 @@ async function testDB() {
 
     console.log("Calling getAllPosts");
     const posts = await getAllPosts();
-    console.log("Result:", posts);
+    console.log("Result-posts:", posts);
 
     console.log("Calling updatePost on posts[0]");
     const updatePostResult = await updatePost(posts[0].id, {
@@ -109,7 +109,7 @@ async function createTables() {
     await client.query(`
     CREATE TABLE posts(
       id SERIAL PRIMARY KEY,
-      "authorId" varchar(255) NOT NULL,
+      "authorId" INTEGER REFERENCES users(id) NOT NULL,
       title varchar(255) NOT NULL,
       content TEXT NOT NULL,
       active BOOLEAN DEFAULT true
