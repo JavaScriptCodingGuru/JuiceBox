@@ -1,16 +1,6 @@
 // inside db/index.js
 const pg = require('pg'); // imports the pg module
-
-// supply the db name and location of the database
-const client = new pg.Client({
-  user: 'postgres',
-  password: 'password',
- host: 'localhost',
-  port: 5555,
-  database: 'juicebox'
-  
-}
-);
+const { client } = require('./client');
 
 async function getAllUsers()
 {
