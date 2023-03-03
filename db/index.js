@@ -161,11 +161,11 @@ async function getUserById(userId) {
 async function getAllPosts() {
   try {
     const {rows: postIds} = await client.query(
-      `SELECT "authorId", title, content, active, id
+      `SELECT id
       FROM posts;`
     );
 
-    const {posts} = await Promise.all(
+    const posts = await Promise.all(
       postIds.map(
         post=> getPostById(post.id)
       )
