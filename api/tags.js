@@ -6,7 +6,7 @@ const tagsRouter = express.Router();
 
 tagsRouter.use((req, res, next)=>
 {
-    console.log("A request is being made to /users");
+    console.log("A request is being made to /tags");
 
     next();
 });
