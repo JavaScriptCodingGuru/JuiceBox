@@ -13,13 +13,10 @@ apiRouter.use(async (req, res, next) => {
     next();
   } else if (auth.startsWith(prefix)) {
     const token = auth.slice(prefix.length);
-    console.log("hello")
     try {
       const { id } = jwt.verify(token, JWT_SECRET);
-      console.log(id, "ID");
       if (id) {
         req.user = await getUserById(id);
-        console.log(req.user, "api index.js")
         next();
       }
     } catch ({ name, message }) {

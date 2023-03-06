@@ -23,7 +23,6 @@ postsRouter.get("/", async(req, res)=>
 
 postsRouter.post('/', requireUser, async (req, res, next)=>
 {   
-    console.log(req.user, "???");
     const {title, content, tags=""} = req.body;
     
     const tagArr = tags.trim().split(/\s+/);
@@ -38,9 +37,8 @@ postsRouter.post('/', requireUser, async (req, res, next)=>
         postData.authorId = req.user.id;
         postData.title = title;
         postData.content = content;
-        console.log("Post DATA: ", postData)
+
         const post = await createPost(postData);
-        console.log(post, "###");
         if(post)
         {
             res.send({post});

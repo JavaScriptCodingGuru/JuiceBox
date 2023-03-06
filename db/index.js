@@ -39,7 +39,6 @@ async function updateUser(id, fields = {}) {
     if (setString.length === 0) {
       return;
     }
-    console.log(setString)
     try {
       const {rows :[user]} = await client.query(`
         UPDATE users
@@ -272,8 +271,6 @@ async function createTags(tagList) {
   const selectValues = tagList.map(
     (_, index) => `$${index + 1}`).join(', ');
   // then we can use (${ selectValues }) in our string template
-
-  console.log(insertValues, selectValues);
 
   try {
     // insert the tags, doing nothing on conflict
