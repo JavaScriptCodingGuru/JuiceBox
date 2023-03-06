@@ -13,13 +13,6 @@ server.use(morgan('dev'));
 
 server.use(express.json());
 
-server.use('/api', apiRouter);
-
-
-client.connect();
-
-
-
 server.use((req, res, next) =>
 {
     console.log("<____Body Logger START____>");
@@ -29,11 +22,10 @@ server.use((req, res, next) =>
   next();
 });
 
+server.use('/api', apiRouter);
 
 
-
-
-
+client.connect();
 
 server.listen(PORT, () => {
   console.log('The server is up on port', PORT)

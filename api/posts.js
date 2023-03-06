@@ -9,7 +9,7 @@ postsRouter.use((req, res, next)=>
 {
     console.log("A request is being made to /posts");
 
-    next(req, res);
+    next();
 });
 
 postsRouter.get("/", async(req, res)=>
@@ -22,7 +22,8 @@ postsRouter.get("/", async(req, res)=>
 });
 
 postsRouter.post('/', requireUser, async (req, res, next)=>
-{
+{   
+    console.log(req.user, "???");
     const {title, content, tags=""} = req.body;
     
     const tagArr = tags.trim().split(/\s+/);
@@ -37,9 +38,9 @@ postsRouter.post('/', requireUser, async (req, res, next)=>
         postData.authorId = req.user.id;
         postData.title = title;
         postData.content = content;
-        console.log("hello")
+        console.log("Post DATA: ", postData)
         const post = await createPost(postData);
-        console.log(post);
+        console.log(post, "###");
         if(post)
         {
             res.send({post});
@@ -54,7 +55,6 @@ postsRouter.post('/', requireUser, async (req, res, next)=>
         next({name, message});
     }
 
-    res.send({message:'under construction'});
 });
 
 module.exports = postsRouter;

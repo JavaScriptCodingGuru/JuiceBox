@@ -68,21 +68,20 @@ async function getUserById(userId) {
   // return the user object
 
   try {
-    const { rows } = await client.query(`
+    const { rows:[user] } = await client.query(`
       SELECT * FROM users
       WHERE "id"=${ userId };
     `);
 
-    if (!rows.length) {
+    if (!user) {
       return null;
     }
-
-    delete rows.password;
+    delete user.password;
 
     const posts = await getPostsByUser(userId);
-    rows.posts = posts;
+    user.posts = posts;
 
-    return rows
+    return user;
   } catch (error) {
     throw error;
   }
