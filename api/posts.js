@@ -9,7 +9,7 @@ postsRouter.use((req, res, next)=>
 {
     console.log("A request is being made to /users");
 
-    next();
+    next(req, res);
 });
 
 postsRouter.get("/", async(req, res)=>
@@ -34,12 +34,12 @@ postsRouter.post('/', requireUser, async (req, res, next)=>
     }
 
     try{
-        postData.userId = req.user.id;
+        postData.authorId = req.user.id;
         postData.title = title;
         postData.content = content;
-
-        const post = await createPost();
-
+        console.log("hello")
+        const post = await createPost(postData);
+        console.log(post);
         if(post)
         {
             res.send({post});
