@@ -13,7 +13,8 @@
   "scripts": {
     "seed:dev": "nodemon ./db/seed.js",
     "start": "node index.js",
-    "start:dev": "nodemon index.js"
+    "start:dev": "nodemon index.js",
+    "seed":"node ./db/seed.js"
   },
   "repository": {
     "type": "git",

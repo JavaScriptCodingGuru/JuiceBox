@@ -1,7 +1,6 @@
 // inside db/index.js
 const pg = require('pg'); // imports the pg module
 const { client } = require('./client');
-
 async function getAllUsers()
 {
     const {rows} = await client.query(
