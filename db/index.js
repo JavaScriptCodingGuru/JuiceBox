@@ -6,7 +6,7 @@ const client = new pg.Client({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
 });
 
-console.log(process.env.DATABASE_URL);
+console.log(process.env.DATABASE_URL==="postgresql://JavaScriptCodingGuru:v2_3zstf_qPvUsDW7wUrgY7LU7EwdhDb@db.bit.io:5432/JavaScriptCodingGuru.juicebox?ssl=true");
 async function getAllUsers()
 {
   try{
