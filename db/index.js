@@ -2,7 +2,7 @@
 require('dotenv').config();
 const pg = require('pg'); // imports the pg module
 const client = new pg.Client({
-  connectionString: (process.env.DATABASE_URL || 'postgres://postgres:password@localhost:5555/juicebox'),
+  connectionString: (process.env.DATABASE_URL),
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
 });
 
