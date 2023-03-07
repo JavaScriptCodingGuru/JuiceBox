@@ -13,11 +13,15 @@ tagsRouter.use((req, res, next)=>
 
 tagsRouter.get("/", async(req, res)=>
 {
-    const tags = await getAllTags();
-
-    res.send({
-        tags
-    });
+    try{
+        const tags = await getAllTags();
+        res.send({
+            tags
+        });
+    } catch({name, message})
+    {
+        next({name, message});
+    }
 });
 
 tagsRouter.get('/:tagName/posts', async (req, res, next) => {

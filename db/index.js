@@ -9,12 +9,17 @@ const client = new pg.Client({
 console.log(process.env.DATABASE_URL);
 async function getAllUsers()
 {
+  try{
     const {rows} = await client.query(
         `SELECT id, username, name, location, active
         FROM users;`
-    );
+        );
+      return rows;
+  }catch(e)
+  {
+    throw e;
+  }
     
-    return rows;
 }
 
 async function createUser({username, password, name, location})
