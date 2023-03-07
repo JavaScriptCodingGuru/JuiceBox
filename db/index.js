@@ -1,10 +1,20 @@
 // inside db/index.js
 require('dotenv').config();
 const pg = require('pg'); // imports the pg module
-const client = new pg.Client({
-  connectionString: (process.env.DATABASE_URL),
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
-});
+const {Pool} = require('pg');
+
+const client = new Pool({
+  host:"db.bit.io",
+  port: 5432,
+  user: "JavaScriptCodingGuru",
+  password:"v2_3ztJT_X8PFy53jzfDFkyVcUgs2xMr",
+  database:"JavaScriptCodingGuru/juicebox",
+  connectionTimeoutMillis: 0,
+    idleTimeoutMillis: 0,
+    min: 10,
+    max: 20,
+  ssl: true
+})
 
 console.log(process.env.DATABASE_URL==="postgresql://JavaScriptCodingGuru:v2_3zstf_qPvUsDW7wUrgY7LU7EwdhDb@db.bit.io:5432/JavaScriptCodingGuru.juicebox?ssl=true");
 async function getAllUsers()
