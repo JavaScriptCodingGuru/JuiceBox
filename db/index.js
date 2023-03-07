@@ -1,9 +1,12 @@
 // inside db/index.js
+require('dotenv').config();
 const pg = require('pg'); // imports the pg module
 const client = new pg.Client({
   connectionString: (process.env.DATABASE_URL || 'postgres://postgres:password@localhost:5555/juicebox'),
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
 });
+
+console.log(process.env.DATABASE_URL);
 async function getAllUsers()
 {
     const {rows} = await client.query(
