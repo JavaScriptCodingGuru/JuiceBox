@@ -1,7 +1,7 @@
 // inside db/index.js
 const pg = require('pg'); // imports the pg module
 const client = new pg.Client({
-  connectionString: ("postgresql://JavaScriptCodingGuru:v2_3zstf_qPvUsDW7wUrgY7LU7EwdhDb@db.bit.io:5432/JavaScriptCodingGuru.juicebox?ssl=true"),
+  connectionString: (process.env.DATABASE_URL || 'postgres://postgres:password@localhost:5555/juicebox'),
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined
 });
 async function getAllUsers()
