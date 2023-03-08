@@ -3,19 +3,9 @@ require('dotenv').config();
 const pg = require('pg'); // imports the pg module
 const {Pool} = require('pg');
 
-let client = new pg.Client({
-  host:"db.bit.io",
-  port: 5432,
-  user: "JavaScriptCodingGuru",
-  password:"v2_3ztJT_X8PFy53jzfDFkyVcUgs2xMr",
-  database:"JavaScriptCodingGuru/juicebox",
-  connectionTimeoutMillis: 0,
-  idleTimeoutMillis: 10,
-  max: 20,
-  ssl: true
-});
+let client = undefined;
 
-function retryConnection()
+function connectClient()
 {
   client = new pg.Client({
     host:"db.bit.io",
@@ -32,7 +22,7 @@ function retryConnection()
   client.on('error',e=>
 {
   console.error("DB ERROR", e)
-  retryConnection();
+  connectClient();
 })
 
 }
@@ -396,5 +386,5 @@ module.exports = {
   getPostsByTagName,
   getAllTags, 
   getPostById,
-  retryConnection
+  connectClient
 }
