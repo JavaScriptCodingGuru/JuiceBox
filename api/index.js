@@ -40,7 +40,7 @@ apiRouter.use('/tags', tagsRouter);
 
 apiRouter.use((error, req, res, next) => {
     next({
-      name: error.name,
+      name: error.name+"ERROR ERROR ERROR",
       message: error.message
     });
   });  

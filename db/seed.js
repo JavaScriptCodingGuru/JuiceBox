@@ -196,7 +196,7 @@ async function rebuildDB() {
 
 rebuildDB()
 .then(testDB)
-  .catch(console.error)
+  .catch(console.error, "ERROR ERROR ERROR")
   .finally(() => client.end());
 
 

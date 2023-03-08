@@ -5,7 +5,7 @@ const express = require('express');
 const morgan = require('morgan')
 const apiRouter = require('./api');
 
-const { client } = require('./db')
+const { client, retryConnection } = require('./db')
 
 const server = express();
 
@@ -26,7 +26,14 @@ server.use('/api', apiRouter);
 
 
 client.connect();
+console.log("connected")
 
 server.listen(PORT, () => {
   console.log('The server is up on port', PORT)
 });
+
+client.on('error',e=>
+{
+  console.error("DB ERROR", e)
+  retryConnection();
+})
