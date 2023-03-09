@@ -11,8 +11,8 @@ function connectClient()
     host:"db.bit.io",
     port: 5432,
     user: "JavaScriptCodingGuru",
-    password:"v2_3zwmw_iVsHtBU6Nc4CWhiyY7FZDkx",
-    database:"JavaScriptCodingGuru/juicebox2",
+    password:"v2_3zwxa_NLmHxzEjixj4ddsZvggDdMv",
+    database:"JavaScriptCodingGuru/juicebox",
     connectionTimeoutMillis: 0,
     idleTimeoutMillis: 10,
     max: 20,
@@ -22,6 +22,7 @@ function connectClient()
   console.log("connected");
   client.on('error',e=>
 {
+  client.end();
   console.error("DB ERROR", e)
   connectClient();
 })
