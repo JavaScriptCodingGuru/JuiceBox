@@ -4,12 +4,15 @@ const PORT = 3000;
 const express = require('express');
 const morgan = require('morgan')
 const apiRouter = require('./api');
+const cors = require("cors");
 
 const { client, connectClient } = require('./db')
 
 const server = express();
 
 server.use(morgan('dev'));
+
+server.use(cors());
 
 server.use(express.json());
 
