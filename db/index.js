@@ -11,20 +11,21 @@ function connectClient()
     host:"db.bit.io",
     port: 5432,
     user: "JavaScriptCodingGuru",
-    password:"v2_3ztJT_X8PFy53jzfDFkyVcUgs2xMr",
-    database:"JavaScriptCodingGuru/juicebox",
+    password:"v2_3zwmw_iVsHtBU6Nc4CWhiyY7FZDkx",
+    database:"JavaScriptCodingGuru/juicebox2",
     connectionTimeoutMillis: 0,
     idleTimeoutMillis: 10,
     max: 20,
     ssl: true
   });
   client.connect();
+  console.log("connected");
   client.on('error',e=>
 {
   console.error("DB ERROR", e)
   connectClient();
 })
-
+return client;
 }
 
 console.log(process.env.DATABASE_URL==="postgresql://JavaScriptCodingGuru:v2_3zstf_qPvUsDW7wUrgY7LU7EwdhDb@db.bit.io:5432/JavaScriptCodingGuru.juicebox?ssl=true");

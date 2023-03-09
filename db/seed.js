@@ -1,9 +1,8 @@
 // inside db/seed.js
 
 // grab our client with destructuring from the export in index.js
-const { client, getAllUsers, createUser, updateUser, getAllPosts, getUserById, createPost, getPostsByUser, updatePost, createTags, createPostTag, addTagsToPost, getPostsByTagName } = require('./index');
-
-
+const { getAllUsers, createUser, updateUser, getAllPosts, getUserById, createPost, getPostsByUser, updatePost, createTags, createPostTag, addTagsToPost, getPostsByTagName, connectClient } = require('./index');
+let client = connectClient();
 // new function, should attempt to create a few users
 async function createInitialUsers() {
   try {
@@ -182,7 +181,7 @@ async function createInitialTags() {
 
 async function rebuildDB() {
   try {
-    client.connect();
+    connectClient();
 
     await dropTables();
     await createTables();
