@@ -159,8 +159,8 @@ async function getUserByUsername(username) {
   
     try {
       // update any fields that need to be updated
+      const client = await pool.connect();
       if (setString.length > 0) {
-        const client = await pool.connect();
         await client.query(`
           UPDATE posts
           SET ${ setString }
@@ -330,12 +330,13 @@ async function createTags(tagList) {
 
 async function createPostTag(postId, tagId) {
   try {
-    const client = await
+    const client = await pool.connect();
     await client.query(`
       INSERT INTO post_tags("postId", "tagId")
       VALUES ($1, $2)
       ON CONFLICT ("postId", "tagId") DO NOTHING;
     `, [postId, tagId]);
+    client.release();
   } catch (error) {
     throw error;
   }
