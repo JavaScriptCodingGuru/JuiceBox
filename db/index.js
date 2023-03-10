@@ -3,57 +3,46 @@ require('dotenv').config();
 const pg = require('pg'); // imports the pg module
 const {Pool} = require('pg');
 
-let client = undefined;
-
-function connectClient()
-{
-  client = new pg.Client({
-    host:"db.bit.io",
-    port: 5432,
-    user: "JavaScriptCodingGuru",
-    password:"v2_3zwxa_NLmHxzEjixj4ddsZvggDdMv",
-    database:"JavaScriptCodingGuru/juicebox",
-    connectionTimeoutMillis: 0,
-    idleTimeoutMillis: 10,
-    max: 20,
-    ssl: true
-  });
-  client.connect();
-  console.log("connected");
-  client.on('error',e=>
-{
-  client.end();
-  console.error("DB ERROR", e)
-  connectClient();
-})
-return client;
-}
+const pool = new Pool({
+  host:"db.bit.io",
+  port: 5432,
+  user: "JavaScriptCodingGuru",
+  password:"v2_3zwxa_NLmHxzEjixj4ddsZvggDdMv",
+  database:"JavaScriptCodingGuru/juicebox",
+  connectionTimeoutMillis: 0,
+  idleTimeoutMillis: 10,
+  max: 20,
+  ssl: true
+});
 
 console.log(process.env.DATABASE_URL==="postgresql://JavaScriptCodingGuru:v2_3zstf_qPvUsDW7wUrgY7LU7EwdhDb@db.bit.io:5432/JavaScriptCodingGuru.juicebox?ssl=true");
 async function getAllUsers()
 {
   try{
+    const client = await pool.connect();
     const {rows} = await client.query(
         `SELECT id, username, name, location, active
         FROM users;`
         );
-      return rows;
+    client.release();
+    return rows;
   }catch(e)
   {
     throw e;
   }
-    
 }
 
 async function createUser({username, password, name, location})
 {
     try{
+        const client = await pool.connect();
         const result= await client.query(`
         INSERT INTO users(username, password, name, location)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (username) DO NOTHING 
         RETURNING *;
       `, [username, password, name, location]);
+      client.release();
         return result.rows;
     }
     catch(e)
@@ -73,13 +62,14 @@ async function updateUser(id, fields = {}) {
       return;
     }
     try {
+      const client = await pool.connect();
       const {rows :[user]} = await client.query(`
         UPDATE users
         SET ${ setString }
         WHERE id=${ id }
         RETURNING *;
       `, Object.values(fields));
-      
+      client.release();
       return user;
     } catch (error) {
       throw error;
@@ -100,6 +90,7 @@ async function getUserById(userId) {
   // return the user object
 
   try {
+    const client = await pool.connect();
     const { rows:[user] } = await client.query(`
       SELECT * FROM users
       WHERE "id"=${ userId };
@@ -112,7 +103,7 @@ async function getUserById(userId) {
 
     const posts = await getPostsByUser(userId);
     user.posts = posts;
-
+    client.release();
     return user;
   } catch (error) {
     throw error;
@@ -121,12 +112,13 @@ async function getUserById(userId) {
 
 async function getUserByUsername(username) {
   try {
+    const client = await pool.connect();
     const { rows: [user] } = await client.query(`
       SELECT *
       FROM users
       WHERE username=$1;
     `, [username]);
-
+    client.release();
     return user;
   } catch (error) {
     throw error;
@@ -140,6 +132,7 @@ async function getUserByUsername(username) {
     tags=[]
   }) {
     try {
+      const client = await pool.connect();
       const {rows:[post]}= await client.query(`
         INSERT INTO posts("authorId", title, content)
         VALUES ($1, $2, $3)
@@ -147,7 +140,7 @@ async function getUserByUsername(username) {
       `, [authorId, title, content]);
 
       const tagList = await createTags(tags);
-
+      client.release();
       return await addTagsToPost(post.id, tagList);
     } catch (error) {
       throw error;
@@ -167,6 +160,7 @@ async function getUserByUsername(username) {
     try {
       // update any fields that need to be updated
       if (setString.length > 0) {
+        const client = await pool.connect();
         await client.query(`
           UPDATE posts
           SET ${ setString }
@@ -196,7 +190,7 @@ async function getUserByUsername(username) {
   
       // and create post_tags as necessary
       await addTagsToPost(postId, tagList);
-  
+      client.release();
       return await getPostById(postId);
     } catch (error) {
       throw error;
@@ -205,6 +199,7 @@ async function getUserByUsername(username) {
 
 async function getAllPosts() {
   try {
+    const client = await pool.connect();
     const {rows: postIds} = await client.query(
       `SELECT id
       FROM posts;`
@@ -215,7 +210,7 @@ async function getAllPosts() {
         post=> getPostById(post.id)
       )
     )
-  
+    client.release();
   return posts;
   } catch (error) {
     throw error;
@@ -224,6 +219,7 @@ async function getAllPosts() {
 
 async function getPostsByUser(userId) {
   try {
+    const client = await pool.connect();
     const { rows:postIds } = await client.query(`
       SELECT * FROM posts
       WHERE "authorId"=${ userId };
@@ -234,7 +230,7 @@ async function getPostsByUser(userId) {
         post=>getPostById(post.id)
         )
       );
-
+    client.release();
     return posts;
   } catch (error) {
     throw error;
@@ -243,6 +239,7 @@ async function getPostsByUser(userId) {
 
 async function getPostById(postId) {
   try {
+    const client = await pool.connect();
     const { rows: [ post ]  } = await client.query(`
       SELECT *
       FROM posts
@@ -266,7 +263,7 @@ async function getPostById(postId) {
     post.author = author;
 
     delete post.authorId;
-
+    client.release();
     return post;
   } catch (error) {
     throw error;
@@ -274,6 +271,7 @@ async function getPostById(postId) {
 }
 async function getPostsByTagName(tagName) {
   try {
+    const client = await pool.connect();
     const { rows: postIds } = await client.query(`
       SELECT posts.id
       FROM posts
@@ -281,7 +279,7 @@ async function getPostsByTagName(tagName) {
       JOIN tags ON tags.id=post_tags."tagId"
       WHERE tags.name=$1;
     `, [tagName]);
-
+    client.release();
     return await Promise.all(postIds.map(
       post => getPostById(post.id)
     ));
@@ -308,6 +306,7 @@ async function createTags(tagList) {
   try {
     // insert the tags, doing nothing on conflict
     // returning nothing, we'll query after
+    const client = await pool.connect();
     await client.query(`
         INSERT INTO tags(name)
         VALUES (${insertValues})
@@ -321,7 +320,7 @@ async function createTags(tagList) {
       WHERE name
       IN (${selectValues});
     `, tagList);
-
+    client.release();
     return result.rows;
 
   } catch (error) {
@@ -331,6 +330,7 @@ async function createTags(tagList) {
 
 async function createPostTag(postId, tagId) {
   try {
+    const client = await
     await client.query(`
       INSERT INTO post_tags("postId", "tagId")
       VALUES ($1, $2)
@@ -358,10 +358,11 @@ async function addTagsToPost(postId, tagList) {
 async function getAllTags()
 {
   try{
+    const client = await pool.connect();
     const result = await client.query(`
       SELECT * FROM tags;
     `)
-
+    client.release();
     return result;
   }
   catch(e)
@@ -372,7 +373,7 @@ async function getAllTags()
 
 
 module.exports = {
-  client,
+  pool,
   getAllUsers,
   createUser,
   updateUser,

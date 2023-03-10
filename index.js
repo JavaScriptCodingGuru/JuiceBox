@@ -6,7 +6,6 @@ const morgan = require('morgan')
 const apiRouter = require('./api');
 const cors = require("cors");
 
-const { client, connectClient } = require('./db')
 
 const server = express();
 
@@ -27,8 +26,6 @@ server.use((req, res, next) =>
 
 server.use('/api', apiRouter);
 
-
-connectClient();
 
 server.listen(PORT, () => {
   console.log('The server is up on port', PORT)
