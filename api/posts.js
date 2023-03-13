@@ -39,8 +39,6 @@ postsRouter.post('/', requireUser, async (req, res, next)=>
     const tagArr = tags.trim().split(/\s+/);
     const postData = {};
 
-    console.log(tagArr);
-
     if(tagArr.length)
     {
         postData.tags = tagArr;
